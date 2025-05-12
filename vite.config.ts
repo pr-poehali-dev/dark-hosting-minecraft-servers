@@ -1,3 +1,4 @@
+
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { fileURLToPath } from 'url';
@@ -17,9 +18,16 @@ export default defineConfig({
   server: {
     host: '0.0.0.0',
     port: 5173,
-    allowedHosts: true,
+    // Дополнительные настройки для корректной работы WebSocket в средах с проксированием
     hmr: {
-      overlay: false // Disables the error overlay if you only want console errors
-    }
+      // Отключаем overlay ошибок, чтобы они не мешали работе
+      overlay: false,
+      // Настройка для корректной работы через проксированное соединение
+      clientPort: 443,
+      // Используем защищенное соединение
+      protocol: 'wss'
+    },
+    // Разрешаем подключения со всех хостов
+    allowedHosts: true
   },
 });
