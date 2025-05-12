@@ -1,10 +1,9 @@
-
-import React from 'react';
-import Navbar from '@/components/Navbar';
-import HeroSection from '@/components/HeroSection';
-import PricingCards from '@/components/PricingCards';
-import FeatureGrid from '@/components/FeatureGrid';
-import Footer from '@/components/Footer';
+import React from "react";
+import Navbar from "@/components/Navbar";
+import HeroSection from "@/components/HeroSection";
+import PricingCards from "@/components/PricingCards";
+import FeatureGrid from "@/components/FeatureGrid";
+import Footer from "@/components/Footer";
 
 const Index = () => {
   return (
@@ -12,7 +11,9 @@ const Index = () => {
       <Navbar />
       <main>
         <HeroSection />
-        <PricingCards />
+        <div id="pricing">
+          <PricingCards />
+        </div>
         <FeatureGrid />
       </main>
       <Footer />
