@@ -1,17 +1,26 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import Icon from "@/components/ui/icon";
-import { useNavigate } from "react-router-dom"; // Добавляем импорт для навигации
+import { useNavigate } from "react-router-dom";
 
 const HeroSection = () => {
-  const navigate = useNavigate(); // Добавляем хук для навигации
+  const navigate = useNavigate();
 
-  // Направляем пользователя на страницу с тарифами
+  // Направляем пользователя на секцию с тарифами
   const handleCreateServer = () => {
     const pricingSection = document.getElementById("pricing");
     if (pricingSection) {
       pricingSection.scrollIntoView({ behavior: "smooth" });
     }
+  };
+
+  // Добавляем обработчик для видеогайда
+  const handleWatchVideo = () => {
+    // В реальном проекте здесь мог бы быть модальный диалог с видео
+    // Для демонстрации просто показываем уведомление
+    alert("Открывается видеогайд по созданию сервера");
+    // Альтернативно можно было бы направить на страницу с видео
+    // navigate("/video-guide");
   };
 
   return (
@@ -47,7 +56,7 @@ const HeroSection = () => {
             <Button
               size="lg"
               className="bg-minecraft-accent hover:bg-minecraft-accent/80 text-white px-8 py-6 text-lg glow-effect"
-              onClick={handleCreateServer} // Добавляем обработчик клика
+              onClick={handleCreateServer}
             >
               Создать сервер
               <Icon name="ChevronRight" className="ml-2" />
@@ -56,6 +65,7 @@ const HeroSection = () => {
               size="lg"
               variant="outline"
               className="border-white/20 hover:bg-white/5 text-white px-8 py-6 text-lg"
+              onClick={handleWatchVideo}
             >
               <Icon name="PlayCircle" className="mr-2" />
               Видеогайд

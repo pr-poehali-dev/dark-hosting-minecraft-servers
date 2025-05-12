@@ -1,13 +1,20 @@
-
-import React, { useState } from 'react';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
-import Icon from '@/components/ui/icon';
-import { useLocation, useNavigate } from 'react-router-dom';
+import React, { useState } from "react";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import Icon from "@/components/ui/icon";
+import { useLocation, useNavigate } from "react-router-dom";
+import { toast } from "@/hooks/use-toast";
 
 interface PlanDetails {
   name: string;
@@ -16,23 +23,19 @@ interface PlanDetails {
 }
 
 const defaultPlan: PlanDetails = {
-  name: 'Стартовый',
-  price: '299₽/мес',
-  features: [
-    '1 ГБ RAM',
-    '10 ГБ SSD',
-    'До 20 игроков'
-  ]
+  name: "Стартовый",
+  price: "299₽/мес",
+  features: ["1 ГБ RAM", "10 ГБ SSD", "До 20 игроков"],
 };
 
 const Checkout = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const [cardNumber, setCardNumber] = useState('');
-  const [cardExpiry, setCardExpiry] = useState('');
-  const [cardCVV, setCardCVV] = useState('');
-  const [cardName, setCardName] = useState('');
-  const [email, setEmail] = useState('');
+  const [cardNumber, setCardNumber] = useState("");
+  const [cardExpiry, setCardExpiry] = useState("");
+  const [cardCVV, setCardCVV] = useState("");
+  const [cardName, setCardName] = useState("");
+  const [email, setEmail] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Получаем план из state или используем план по умолчанию
@@ -40,14 +43,14 @@ const Checkout = () => {
 
   // Форматирование номера карты в группы по 4 цифры
   const handleCardNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value.replace(/\D/g, '');
-    const formattedValue = value.replace(/(\d{4})(?=\d)/g, '$1 ');
+    const value = e.target.value.replace(/\D/g, "");
+    const formattedValue = value.replace(/(\d{4})(?=\d)/g, "$1 ");
     setCardNumber(formattedValue.slice(0, 19)); // Ограничение длины для формата XXXX XXXX XXXX XXXX
   };
 
   // Форматирование срока действия в формате MM/YY
   const handleExpiryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value.replace(/\D/g, '');
+    const value = e.target.value.replace(/\D/g, "");
     if (value.length <= 2) {
       setCardExpiry(value);
     } else {
@@ -57,45 +60,102 @@ const Checkout = () => {
 
   // Ограничение CVV до 3 цифр
   const handleCVVChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value.replace(/\D/g, '');
+    const value = e.target.value.replace(/\D/g, "");
     setCardCVV(value.slice(0, 3));
+  };
+
+  // Подсказка по CVV
+  const handleCVVHelp = () => {
+    toast({
+      title: "CVV/CVC код",
+      description: "3 цифры на обратной стороне карты",
+    });
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Простая валидация полей
+    if (!cardNumber || cardNumber.replace(/\s/g, "").length < 16) {
+      toast({
+        title: "Ошибка",
+        description: "Введите корректный номер карты",
+      });
+      return;
+    }
+
+    if (!cardExpiry || !cardExpiry.includes("/") || cardExpiry.length < 5) {
+      toast({
+        title: "Ошибка",
+        description: "Введите корректный срок действия карты",
+      });
+      return;
+    }
+
+    if (!cardCVV || cardCVV.length < 3) {
+      toast({
+        title: "Ошибка",
+        description: "Введите корректный CVV код",
+      });
+      return;
+    }
+
+    if (!cardName) {
+      toast({
+        title: "Ошибка",
+        description: "Введите имя владельца карты",
+      });
+      return;
+    }
+
+    if (!email || !email.includes("@")) {
+      toast({
+        title: "Ошибка",
+        description: "Введите корректный email",
+      });
+      return;
+    }
+
     setIsSubmitting(true);
-    
+
     // Имитация отправки платежа
     setTimeout(() => {
       setIsSubmitting(false);
-      navigate('/success', { state: { plan } });
+      navigate("/success", { state: { plan } });
     }, 2000);
   };
 
   // Извлечение числового значения из строки цены (например, "299₽/мес" -> 299)
-  const numericPrice = parseInt(plan.price.match(/\d+/)?.[0] || '0');
-  
+  const numericPrice = parseInt(plan.price.match(/\d+/)?.[0] || "0");
+
   return (
     <div className="min-h-screen flex flex-col bg-minecraft-dark">
       <Navbar />
       <main className="flex-1 pt-28 pb-16">
         <div className="container mx-auto px-4 md:px-6">
           <div className="max-w-4xl mx-auto">
-            <h1 className="text-3xl md:text-4xl font-bold mb-8 text-center">Оформление покупки</h1>
-            
+            <h1 className="text-3xl md:text-4xl font-bold mb-8 text-center">
+              Оформление покупки
+            </h1>
+
             <div className="grid md:grid-cols-3 gap-8">
               {/* Форма оплаты */}
               <div className="md:col-span-2">
                 <Card className="bg-minecraft-gray/10 border-minecraft-gray/30">
                   <CardHeader>
                     <CardTitle>Данные оплаты</CardTitle>
-                    <CardDescription>Введите данные вашей карты для оплаты</CardDescription>
+                    <CardDescription>
+                      Введите данные вашей карты для оплаты
+                    </CardDescription>
                   </CardHeader>
                   <CardContent>
                     <form onSubmit={handleSubmit} className="space-y-6">
                       <div className="space-y-4">
                         <div>
-                          <label htmlFor="email" className="block text-sm font-medium mb-2">
+                          <label
+                            htmlFor="email"
+                            className="block text-sm font-medium mb-2"
+                          >
                             Email
                           </label>
                           <Input
@@ -108,9 +168,12 @@ const Checkout = () => {
                             onChange={(e) => setEmail(e.target.value)}
                           />
                         </div>
-                        
+
                         <div>
-                          <label htmlFor="cardName" className="block text-sm font-medium mb-2">
+                          <label
+                            htmlFor="cardName"
+                            className="block text-sm font-medium mb-2"
+                          >
                             Имя владельца карты
                           </label>
                           <Input
@@ -119,12 +182,17 @@ const Checkout = () => {
                             required
                             className="bg-minecraft-gray/20 border-minecraft-gray/30"
                             value={cardName}
-                            onChange={(e) => setCardName(e.target.value.toUpperCase())}
+                            onChange={(e) =>
+                              setCardName(e.target.value.toUpperCase())
+                            }
                           />
                         </div>
-                        
+
                         <div>
-                          <label htmlFor="cardNumber" className="block text-sm font-medium mb-2">
+                          <label
+                            htmlFor="cardNumber"
+                            className="block text-sm font-medium mb-2"
+                          >
                             Номер карты
                           </label>
                           <div className="relative">
@@ -138,14 +206,21 @@ const Checkout = () => {
                               maxLength={19}
                             />
                             <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
-                              <Icon name="CreditCard" className="text-minecraft-accent" size={20} />
+                              <Icon
+                                name="CreditCard"
+                                className="text-minecraft-accent"
+                                size={20}
+                              />
                             </div>
                           </div>
                         </div>
-                        
+
                         <div className="grid grid-cols-2 gap-4">
                           <div>
-                            <label htmlFor="expiry" className="block text-sm font-medium mb-2">
+                            <label
+                              htmlFor="expiry"
+                              className="block text-sm font-medium mb-2"
+                            >
                               Срок действия
                             </label>
                             <Input
@@ -159,7 +234,10 @@ const Checkout = () => {
                             />
                           </div>
                           <div>
-                            <label htmlFor="cvv" className="block text-sm font-medium mb-2">
+                            <label
+                              htmlFor="cvv"
+                              className="block text-sm font-medium mb-2"
+                            >
                               CVV/CVC
                             </label>
                             <div className="relative">
@@ -173,14 +251,21 @@ const Checkout = () => {
                                 maxLength={3}
                                 type="password"
                               />
-                              <div className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-help">
-                                <Icon name="HelpCircle" className="text-minecraft-gray/50" size={16} />
+                              <div
+                                className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-help"
+                                onClick={handleCVVHelp}
+                              >
+                                <Icon
+                                  name="HelpCircle"
+                                  className="text-minecraft-gray/50"
+                                  size={16}
+                                />
                               </div>
                             </div>
                           </div>
                         </div>
                       </div>
-                      
+
                       <Button
                         type="submit"
                         className="w-full bg-minecraft-accent hover:bg-minecraft-accent/80 py-6 text-lg glow-effect"
@@ -188,7 +273,10 @@ const Checkout = () => {
                       >
                         {isSubmitting ? (
                           <>
-                            <Icon name="Loader2" className="mr-2 animate-spin" />
+                            <Icon
+                              name="Loader2"
+                              className="mr-2 animate-spin"
+                            />
                             Обработка...
                           </>
                         ) : (
@@ -196,22 +284,44 @@ const Checkout = () => {
                         )}
                       </Button>
                     </form>
-                    
+
                     <div className="mt-6 flex items-center justify-center space-x-3">
-                      <Icon name="Lock" size={16} className="text-minecraft-green" />
-                      <span className="text-sm text-white/60">Защищенная оплата SSL</span>
+                      <Icon
+                        name="Lock"
+                        size={16}
+                        className="text-minecraft-green"
+                      />
+                      <span className="text-sm text-white/60">
+                        Защищенная оплата SSL
+                      </span>
                     </div>
-                    
+
                     <div className="mt-4 flex justify-center space-x-4">
-                      <Icon name="CreditCard" size={24} className="text-white/40" />
-                      <Icon name="CreditCard" size={24} className="text-white/40" />
-                      <Icon name="CreditCard" size={24} className="text-white/40" />
-                      <Icon name="CreditCard" size={24} className="text-white/40" />
+                      <Icon
+                        name="CreditCard"
+                        size={24}
+                        className="text-white/40"
+                      />
+                      <Icon
+                        name="CreditCard"
+                        size={24}
+                        className="text-white/40"
+                      />
+                      <Icon
+                        name="CreditCard"
+                        size={24}
+                        className="text-white/40"
+                      />
+                      <Icon
+                        name="CreditCard"
+                        size={24}
+                        className="text-white/40"
+                      />
                     </div>
                   </CardContent>
                 </Card>
               </div>
-              
+
               {/* Сумма заказа */}
               <div>
                 <Card className="bg-minecraft-gray/10 border-minecraft-gray/30">
@@ -224,37 +334,41 @@ const Checkout = () => {
                         <span className="font-medium">Тариф:</span>
                         <span className="font-bold">{plan.name}</span>
                       </div>
-                      
+
                       <div className="space-y-2">
                         {plan.features.map((feature, index) => (
                           <div key={index} className="flex items-start">
-                            <Icon name="Check" className="mr-2 text-minecraft-green shrink-0 mt-1" size={16} />
+                            <Icon
+                              name="Check"
+                              className="mr-2 text-minecraft-green shrink-0 mt-1"
+                              size={16}
+                            />
                             <span className="text-white/80">{feature}</span>
                           </div>
                         ))}
                       </div>
-                      
+
                       <Separator className="bg-minecraft-gray/30" />
-                      
+
                       <div className="flex items-center justify-between">
                         <span className="font-medium">Подписка:</span>
                         <span>{plan.price}</span>
                       </div>
-                      
+
                       {numericPrice > 500 && (
                         <div className="flex items-center justify-between text-minecraft-green">
                           <span className="font-medium">Скидка:</span>
                           <span>-10%</span>
                         </div>
                       )}
-                      
+
                       <Separator className="bg-minecraft-gray/30" />
-                      
+
                       <div className="flex items-center justify-between text-lg font-bold">
                         <span>Итого:</span>
                         <span>
-                          {numericPrice > 500 
-                            ? `${Math.round(numericPrice * 0.9)}₽/мес` 
+                          {numericPrice > 500
+                            ? `${Math.round(numericPrice * 0.9)}₽/мес`
                             : plan.price}
                         </span>
                       </div>

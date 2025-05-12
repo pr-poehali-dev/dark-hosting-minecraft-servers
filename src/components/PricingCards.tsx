@@ -8,7 +8,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import Icon from "@/components/ui/icon";
-import { useNavigate } from "react-router-dom"; // Добавляем импорт для навигации
+import { useNavigate } from "react-router-dom";
+import { toast } from "@/hooks/use-toast";
 
 interface PricingPlan {
   name: string;
@@ -74,11 +75,30 @@ const pricingPlans: PricingPlan[] = [
 ];
 
 const PricingCards = () => {
-  const navigate = useNavigate(); // Добавляем хук для навигации
+  const navigate = useNavigate();
 
   // Функция для перехода на страницу оформления заказа с передачей данных о выбранном тарифе
   const handleSelectPlan = (plan: PricingPlan) => {
     navigate("/checkout", { state: { plan } });
+  };
+
+  // Обработчик для кнопки индивидуальных тарифов
+  const handleCustomPlan = () => {
+    toast({
+      title: "Индивидуальный тариф",
+      description: "Наши специалисты свяжутся с вами в ближайшее время",
+    });
+
+    // Имитация открытия формы обратной связи
+    setTimeout(() => {
+      const email = prompt("Укажите ваш email для связи:");
+      if (email) {
+        toast({
+          title: "Спасибо!",
+          description: "Мы получили ваш запрос и скоро свяжемся с вами.",
+        });
+      }
+    }, 500);
   };
 
   return (
@@ -141,7 +161,7 @@ const PricingCards = () => {
                 <Button
                   className={`w-full py-6 ${plan.popular ? "bg-minecraft-accent hover:bg-minecraft-accent/80 glow-effect" : ""}`}
                   variant={plan.buttonVariant}
-                  onClick={() => handleSelectPlan(plan)} // Добавляем обработчик клика
+                  onClick={() => handleSelectPlan(plan)}
                 >
                   Выбрать тариф
                 </Button>
@@ -155,6 +175,7 @@ const PricingCards = () => {
           <Button
             variant="ghost"
             className="text-minecraft-accent hover:text-minecraft-accent/80"
+            onClick={handleCustomPlan}
           >
             Связаться для индивидуальных тарифов
             <Icon name="ArrowRight" className="ml-2" size={16} />
